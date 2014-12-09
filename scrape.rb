@@ -4,26 +4,25 @@ require 'nokogiri'
 require 'csv'
 require 'pry'
 
-url = 'http://support.apple.com/ja-jp/HT6441'
+url = ARGV[0] 
 
 charset = nil
 html = open(url) do |f|
-  charset = f.charset # 文字種別を取得
-  f.read # htmlを読み込んで変数htmlに渡す
+  charset = f.charset
+  f.read
 end
 
 doc = Nokogiri::HTML.parse(html, nil, charset)
-output = "aaa.csv"
+m = url.match(%r{http://.*.apple.com/.*/(.+?)$})
+output = m[1] + '.csv'
+csv = CSV.open(output,"ab:utf-8")
 
-# Appleの脆弱性情報は1件ごとにulでまとめられている
+
+# Appleの脆弱性情報は1件ごとにtype=circleのulでまとめられている
 doc.xpath('//ul[@type="circle"]/li').each do |li|
   buf = [] 
   li.xpath('p').each do | lip |
     buf.push(lip.text)
   end
-  
-  CSV.open(output,"ab") do |csv|
-    csv << buf
-  end
+  csv << buf
 end
-
