@@ -14,8 +14,8 @@ end
 
 doc = Nokogiri::HTML.parse(html, nil, charset)
 m = url.match(%r{http://.*.apple.com/.*/(.+?)$})
-output = m[1] + '.csv'
-csv = CSV.open(output,"ab:utf-8")
+output = m[1] + '.csv'  # match結果は配列の[1]に入る
+csv = CSV.open(output,"a:utf-8")
 
 
 # Appleの脆弱性情報は1件ごとにtype=circleのulでまとめられている
@@ -25,4 +25,9 @@ doc.xpath('//ul[@type="circle"]/li').each do |li|
     buf.push(lip.text)
   end
   csv << buf
+end
+
+# BOM挿入(\uFEFF)
+open(output, 'r+:utf-8') do |f|
+  f.puts "\uFEFF#{open(output, "r:utf-8").read}"
 end
