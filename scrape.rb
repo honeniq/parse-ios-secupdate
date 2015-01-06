@@ -4,7 +4,11 @@ require 'nokogiri'
 require 'csv'
 require 'pry'
 
-url = ARGV[0] 
+if ARGV.count == 0
+  url = "http://support.apple.com/ja-jp/HT6590"
+else
+  url = ARGV[0] 
+end
 
 charset = nil
 html = open(url) do |f|
